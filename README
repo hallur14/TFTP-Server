@@ -1,0 +1,45 @@
+TFTP Server 
+Hallur Olafsson - hallur14@ru.is
+
+We use 4 global variables. A "serverBlockNumber", an itertor that counts
+each successful package the program has processed and sent with a positive 
+response. A "path" to which we create a path to the location of the file
+requested. A "filePtr" that points to the head of the file we will be
+working with. An array which acts as the package we send to the client
+we call "PackageToSend".
+
+
+The "processRequest" function takes in an opcode and filles the 
+PackageToSend with 512 bytes of data from the inputstream. It also updates
+the dataLength which we use to makes sure the last package sent is of the
+correct size.
+
+To get the path to the file the client requests we use "getcwd" and then
+concat the rest of the info we need from info we get in the client's 
+request.
+
+We check if the server gets correct parameters and send and error message
+and terminate the program if we don't get a port and base data folder.
+
+When our loop starts we reset the "fullPart" and the "message" so that each
+index in the arrays are 0.
+
+Next we check the client Opcodes. The only error handlding for opcodes we
+are doing is that we send an error message to console and terminate the 
+program. We check wether the opcode is ACK and if it is we get the 
+opcode we received from the client. If we receive a RRQ or a WRQ we finish
+building the path previously mentioned and get the mode sent in from the 
+client, being netascii or octet.
+
+We open the file in Read mode or Read binary mode depending on if the 
+transfer mode is netascii or octet.
+Once the file is open we go into the "ProcessRequest" function which 
+prepares the package we want to send to the client. 
+If we receive an ACK opcode from the client we check if it matches our 
+"serverBlockNumber". If it doesn't we send the same package as we did 
+previously. If it mathces we ready a new package to send and increment the
+"serverBlockNumber".
+
+Next we send the package and this process repeats untill we the "dataLength"
+variable get below 512. This way we know we've sent out last package and 
+the program can close.
